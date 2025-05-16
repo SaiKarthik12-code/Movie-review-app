@@ -202,9 +202,11 @@ const baseMovies: Movie[] = [
 const OMDB_API_KEY = process.env.OMDB_API_KEY;
 const OMDB_API_URL = `http://www.omdbapi.com/`;
 
+const TMDB_API_KEY = process.env.TMDB_API_KEY;
+const TMDB_API_URL_BASE = `https://api.themoviedb.org/3`;
+
 async function fetchFromOMDB(params: Record<string, string>): Promise<any> {
   if (!OMDB_API_KEY) {
-    // console.warn("OMDB_API_KEY is not set. OMDB fetch will be skipped. Falling back to mock data.");
     return null;
   }
   const queryParams = new URLSearchParams({ ...params, apikey: OMDB_API_KEY });
@@ -216,7 +218,6 @@ async function fetchFromOMDB(params: Record<string, string>): Promise<any> {
     }
     const data = await response.json();
     if (data.Response === "False") {
-      // console.warn(`OMDB API 'Movie not found' or other error for params ${JSON.stringify(params)}: ${data.Error}`);
       return null;
     }
     return data;
@@ -225,6 +226,46 @@ async function fetchFromOMDB(params: Record<string, string>): Promise<any> {
     return null;
   }
 }
+
+async function fetchTMDBData(endpoint: string, params: Record<string, string> = {}): Promise<any> {
+  if (!TMDB_API_KEY) {
+    return null;
+  }
+  const queryParams = new URLSearchParams({ ...params, api_key: TMDB_API_KEY });
+  try {
+    const response = await fetch(`${TMDB_API_URL_BASE}${endpoint}?${queryParams}`);
+    if (!response.ok) {
+      console.error(`TMDB API error for endpoint ${endpoint} with params ${JSON.stringify(params)}: ${response.statusText}`);
+      return null;
+    }
+    return await response.json();
+  } catch (error) {
+    console.error(`Network error fetching from TMDB for endpoint ${endpoint} with params ${JSON.stringify(params)}:`, error);
+    return null;
+  }
+}
+
+async function searchMovieOnTMDB(title: string, year?: number): Promise<number | null> {
+  const params: Record<string, string> = { query: title };
+  if (year) {
+    params.year = String(year);
+  }
+  const data = await fetchTMDBData('/search/movie', params);
+  if (data && data.results && data.results.length > 0) {
+    // Attempt to match by year if provided, otherwise take the first result
+    const movieResult = year 
+      ? data.results.find((m: any) => m.release_date && new Date(m.release_date).getFullYear() === year) 
+      : data.results[0];
+    return movieResult ? movieResult.id : (data.results[0]?.id || null);
+  }
+  return null;
+}
+
+async function getMovieVideosFromTMDB(tmdbMovieId: number): Promise<any[]> {
+  const data = await fetchTMDBData(`/movie/${tmdbMovieId}/videos`);
+  return (data && data.results) ? data.results : [];
+}
+
 
 function parseDuration(runtimeStr?: string): number | undefined {
   if (!runtimeStr || runtimeStr === "N/A") return undefined;
@@ -240,88 +281,95 @@ function parseRating(imdbRatingStr?: string): number | undefined {
 
 function parseYear(releasedStr?: string): number | undefined {
     if (!releasedStr || releasedStr === "N/A") return undefined;
-    // OMDB 'Released' can be "01 Jul 2010"
     const date = new Date(releasedStr);
     const year = date.getFullYear();
-    // If parsing fails, it might return NaN or an incorrect year for partial dates.
-    // A more robust parser might be needed for all OMDB date formats.
     return isNaN(year) || year < 1800 || year > new Date().getFullYear() + 5 ? undefined : year;
 }
 
-async function enrichMovieWithOMDB(movie: Movie): Promise<Movie> {
-  const omdbData = await fetchFromOMDB({ t: movie.title, y: String(movie.releaseYear), plot: 'full' });
+async function fetchAndEnrichMovieData(baseMovie: Movie): Promise<Movie> {
+  let movie = { ...baseMovie };
 
-  if (!omdbData) {
-    if (!OMDB_API_KEY && OMDB_API_KEY !== undefined) { // Only warn if key is explicitly empty, not if undefined (e.g. build time)
-         console.warn(`OMDB_API_KEY is not set. Using mock data for "${movie.title}".`);
+  // 1. Enrich with OMDB data (if key exists)
+  if (OMDB_API_KEY) {
+    const omdbData = await fetchFromOMDB({ t: movie.title, y: String(movie.releaseYear), plot: 'full' });
+    if (omdbData) {
+      movie = {
+        ...movie,
+        imdbID: omdbData.imdbID || movie.imdbID,
+        title: omdbData.Title || movie.title,
+        description: omdbData.Plot && omdbData.Plot !== "N/A" ? omdbData.Plot : movie.description,
+        genre: omdbData.Genre && omdbData.Genre !== "N/A" ? omdbData.Genre.split(',')[0].trim() : movie.genre,
+        posterUrl: omdbData.Poster && omdbData.Poster !== "N/A" ? omdbData.Poster : movie.posterUrl,
+        releaseYear: parseYear(omdbData.Released) || movie.releaseYear,
+        rating: parseRating(omdbData.imdbRating) || movie.rating,
+        durationMinutes: parseDuration(omdbData.Runtime) || movie.durationMinutes,
+        director: omdbData.Director && omdbData.Director !== "N/A" ? omdbData.Director : movie.director,
+        cast: omdbData.Actors && omdbData.Actors !== "N/A" ? omdbData.Actors.split(',').map((actor: string) => actor.trim()) : movie.cast,
+      };
+    } else if (OMDB_API_KEY && OMDB_API_KEY !== undefined) {
+        // console.warn(`OMDB data not found for "${movie.title}". Using existing mock data.`);
     }
-    return movie; // Return original mock data if OMDB fetch fails or no key
+  } else if (OMDB_API_KEY !== undefined) { // Key is explicitly empty string
+      // console.warn(`OMDB_API_KEY is not set. Using mock data for "${movie.title}".`);
   }
 
-  return {
-    ...movie, // Keep original id, videoUrl, and other fields as defaults
-    imdbID: omdbData.imdbID || movie.imdbID,
-    title: omdbData.Title || movie.title,
-    description: omdbData.Plot && omdbData.Plot !== "N/A" ? omdbData.Plot : movie.description,
-    genre: omdbData.Genre && omdbData.Genre !== "N/A" ? omdbData.Genre.split(',')[0].trim() : movie.genre,
-    posterUrl: omdbData.Poster && omdbData.Poster !== "N/A" ? omdbData.Poster : movie.posterUrl,
-    releaseYear: parseYear(omdbData.Released) || movie.releaseYear,
-    rating: parseRating(omdbData.imdbRating) || movie.rating,
-    durationMinutes: parseDuration(omdbData.Runtime) || movie.durationMinutes,
-    director: omdbData.Director && omdbData.Director !== "N/A" ? omdbData.Director : movie.director,
-    cast: omdbData.Actors && omdbData.Actors !== "N/A" ? omdbData.Actors.split(',').map((actor: string) => actor.trim()) : movie.cast,
-    // videoUrl remains from mock data, as OMDB doesn't provide it.
-  };
+
+  // 2. Enrich with TMDB trailer (if key exists)
+  if (TMDB_API_KEY) {
+    const tmdbMovieId = await searchMovieOnTMDB(movie.title, movie.releaseYear);
+    if (tmdbMovieId) {
+      const videos = await getMovieVideosFromTMDB(tmdbMovieId);
+      const officialTrailer = videos.find(v => v.site === 'YouTube' && v.type === 'Trailer' && v.official === true);
+      const trailer = officialTrailer || videos.find(v => v.site === 'YouTube' && v.type === 'Trailer');
+      
+      if (trailer && trailer.key) {
+        movie.videoUrl = `https://www.youtube.com/embed/${trailer.key}`;
+      } else {
+        // console.warn(`TMDB trailer not found for "${movie.title}". Keeping existing videoUrl.`);
+      }
+    } else {
+        // console.warn(`TMDB movie ID not found for "${movie.title}".`);
+    }
+  } else if (TMDB_API_KEY !== undefined) { // Key is explicitly empty string
+      // console.warn(`TMDB_API_KEY is not set. Cannot fetch trailers for "${movie.title}".`);
+  }
+
+  return movie;
 }
 
 // Simulate API delay for all functions
-const simulateDelay = () => new Promise(resolve => setTimeout(resolve, 50)); // Reduced delay
+const simulateDelay = () => new Promise(resolve => setTimeout(resolve, 50)); 
 
 export const getMovies = async (): Promise<Movie[]> => {
   await simulateDelay();
-  if (!OMDB_API_KEY && OMDB_API_KEY !== undefined) {
-    console.warn("OMDB_API_KEY is not set. Returning base mock data for getMovies().");
+  if (!OMDB_API_KEY && !TMDB_API_KEY && OMDB_API_KEY !== undefined && TMDB_API_KEY !== undefined) {
+    console.warn("Neither OMDB_API_KEY nor TMDB_API_KEY are set. Returning base mock data for getMovies().");
     return baseMovies;
   }
-  const enrichedMovies = await Promise.all(baseMovies.map(enrichMovieWithOMDB));
+  const enrichedMovies = await Promise.all(baseMovies.map(fetchAndEnrichMovieData));
   return enrichedMovies;
 };
 
 export const getMovieById = async (id: string): Promise<Movie | undefined> => {
   await simulateDelay();
-  const baseMovie = baseMovies.find(movie => movie.id === id);
-  if (!baseMovie) return undefined;
+  const baseMovieToEnrich = baseMovies.find(movie => movie.id === id);
+  if (!baseMovieToEnrich) return undefined;
 
-  if (!OMDB_API_KEY && OMDB_API_KEY !== undefined) {
-     console.warn(`OMDB_API_KEY is not set. Returning base mock data for movie ID "${id}".`);
-    return baseMovie;
+  if (!OMDB_API_KEY && !TMDB_API_KEY && OMDB_API_KEY !== undefined && TMDB_API_KEY !== undefined) {
+     console.warn(`Neither OMDB_API_KEY nor TMDB_API_KEY are set. Returning base mock data for movie ID "${id}".`);
+    return baseMovieToEnrich;
   }
-  return enrichMovieWithOMDB(baseMovie);
+  return fetchAndEnrichMovieData(baseMovieToEnrich);
 };
 
 export const getMoviesByGenre = async (genre: string): Promise<Movie[]> => {
   await simulateDelay();
   const lowerGenre = genre.toLowerCase();
-  // Filter base movies first
-  const filteredBaseMovies = baseMovies.filter(movie => 
-    (movie.genre.toLowerCase() === lowerGenre) || 
-    (movie.genre.toLowerCase().split(',').map(g => g.trim()).includes(lowerGenre)) // Handle if base genre is comma-sep
-  );
-
-  if (!OMDB_API_KEY && OMDB_API_KEY !== undefined) {
-    console.warn(`OMDB_API_KEY is not set. Returning base mock data for genre "${genre}".`);
-    return filteredBaseMovies;
-  }
-
-  // Enrich the initially filtered movies
-  const enrichedFilteredMovies = await Promise.all(filteredBaseMovies.map(enrichMovieWithOMDB));
   
-  // OMDB might return a different primary genre, so we might need to re-filter or adjust logic.
-  // For now, we assume the enrichment doesn't change the genre so much it invalidates the initial filter,
-  // or we accept that the enrichment provides more accurate genre data.
-  // A stricter approach would be to enrich all, then filter by genre, but that's less efficient.
-  // Let's re-filter on the enriched data to be sure.
-  return enrichedFilteredMovies.filter(movie =>
+  // Enrich all movies first, then filter by genre. This is more accurate after enrichment.
+  const allEnrichedMovies = await Promise.all(baseMovies.map(fetchAndEnrichMovieData));
+  
+  return allEnrichedMovies.filter(movie =>
     movie.genre.toLowerCase() === lowerGenre ||
     movie.genre.toLowerCase().split(',').map(g => g.trim()).includes(lowerGenre)
   );
@@ -331,7 +379,7 @@ export const searchMovies = async (query: string): Promise<Movie[]> => {
   await simulateDelay();
   const lowerQuery = query.toLowerCase();
   
-  const allMovies = await getMovies(); // This gets all movies, potentially enriched
+  const allMovies = await getMovies(); // This gets all movies, enriched
 
   return allMovies.filter(movie =>
     movie.title.toLowerCase().includes(lowerQuery) ||
@@ -346,7 +394,9 @@ export const searchMovies = async (query: string): Promise<Movie[]> => {
 export const getGenres = async (): Promise<string[]> => {
   await simulateDelay();
   // Get genres from the base static list to ensure consistency in UI,
-  // as OMDB genres can be more varied or comma-separated.
+  // as OMDB/TMDB genres can be more varied or comma-separated.
+  // For more dynamic genres, enrich all movies and then extract genres.
   const genres = new Set(baseMovies.map(movie => movie.genre.split(',')[0].trim()));
-  return Array.from(genres);
+  return Array.from(genres).sort();
 };
+
