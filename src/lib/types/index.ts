@@ -1,12 +1,13 @@
 export interface Movie {
-  id: string;
+  id: string; // App's internal ID
+  imdbID?: string; // IMDb ID from OMDB
   title: string;
   description: string;
   genre: string;
   posterUrl: string;
-  videoUrl: string;
+  videoUrl: string; // This will still come from mock data, not OMDB
   releaseYear: number;
-  rating: number; // Example: 1-5 or 1-10
+  rating: number;
   durationMinutes: number;
   director?: string;
   cast?: string[];
