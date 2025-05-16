@@ -52,7 +52,7 @@ export default async function MoviePage({ params }: MoviePageProps) {
             alt={`Poster for ${movie.title}`}
             width={400}
             height={600}
-            className="w-full h-auto object-cover rounded-lg shadow-xl"
+            className="w-full object-cover rounded-lg shadow-xl"
             data-ai-hint={`${movie.genre.toLowerCase()} film`}
           />
         </div>

@@ -22,7 +22,7 @@ export function MovieCard({ movie }: MovieCardProps) {
             alt={`Poster for ${movie.title}`}
             width={300}
             height={450}
-            className="w-full h-auto object-cover aspect-[2/3]"
+            className="w-full object-cover"
             data-ai-hint={dataAiHintWords || "movie poster"}
           />
           <div className="absolute top-2 right-2 z-10">
