@@ -24,6 +24,7 @@ export function MovieCard({ movie }: MovieCardProps) {
             height={450}
             className="w-full object-cover"
             data-ai-hint={dataAiHintWords || "movie poster"}
+            priority={true}
           />
           <div className="absolute top-2 right-2 z-10">
             <FavoriteButton movieId={movie.id} movieTitle={movie.title} />

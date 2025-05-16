@@ -253,8 +253,8 @@ async function searchMovieOnTMDB(title: string, year?: number): Promise<number |
   const data = await fetchTMDBData('/search/movie', params);
   if (data && data.results && data.results.length > 0) {
     // Attempt to match by year if provided, otherwise take the first result
-    const movieResult = year 
-      ? data.results.find((m: any) => m.release_date && new Date(m.release_date).getFullYear() === year) 
+    const movieResult = year
+      ? data.results.find((m: any) => m.release_date && new Date(m.release_date).getFullYear() === year)
       : data.results[0];
     return movieResult ? movieResult.id : (data.results[0]?.id || null);
   }
@@ -307,7 +307,7 @@ async function fetchAndEnrichMovieData(baseMovie: Movie): Promise<Movie> {
         cast: omdbData.Actors && omdbData.Actors !== "N/A" ? omdbData.Actors.split(',').map((actor: string) => actor.trim()) : movie.cast,
       };
     } else if (OMDB_API_KEY && OMDB_API_KEY !== undefined) {
-        // console.warn(`OMDB data not found for "${movie.title}". Using existing mock data.`);
+        console.warn(`OMDB data not found for "${movie.title}". Using existing mock data.`);
     }
   } else if (OMDB_API_KEY !== undefined) { // Key is explicitly empty string
       // console.warn(`OMDB_API_KEY is not set. Using mock data for "${movie.title}".`);
@@ -321,14 +321,14 @@ async function fetchAndEnrichMovieData(baseMovie: Movie): Promise<Movie> {
       const videos = await getMovieVideosFromTMDB(tmdbMovieId);
       const officialTrailer = videos.find(v => v.site === 'YouTube' && v.type === 'Trailer' && v.official === true);
       const trailer = officialTrailer || videos.find(v => v.site === 'YouTube' && v.type === 'Trailer');
-      
+
       if (trailer && trailer.key) {
         movie.videoUrl = `https://www.youtube.com/embed/${trailer.key}`;
       } else {
-        // console.warn(`TMDB trailer not found for "${movie.title}". Keeping existing videoUrl.`);
+        console.warn(`TMDB trailer not found for "${movie.title}". Keeping existing videoUrl.`);
       }
     } else {
-        // console.warn(`TMDB movie ID not found for "${movie.title}".`);
+        console.warn(`TMDB movie ID not found for "${movie.title}".`);
     }
   } else if (TMDB_API_KEY !== undefined) { // Key is explicitly empty string
       // console.warn(`TMDB_API_KEY is not set. Cannot fetch trailers for "${movie.title}".`);
@@ -338,7 +338,7 @@ async function fetchAndEnrichMovieData(baseMovie: Movie): Promise<Movie> {
 }
 
 // Simulate API delay for all functions
-const simulateDelay = () => new Promise(resolve => setTimeout(resolve, 50)); 
+const simulateDelay = () => new Promise(resolve => setTimeout(resolve, 50));
 
 export const getMovies = async (): Promise<Movie[]> => {
   await simulateDelay();
@@ -365,10 +365,10 @@ export const getMovieById = async (id: string): Promise<Movie | undefined> => {
 export const getMoviesByGenre = async (genre: string): Promise<Movie[]> => {
   await simulateDelay();
   const lowerGenre = genre.toLowerCase();
-  
+
   // Enrich all movies first, then filter by genre. This is more accurate after enrichment.
   const allEnrichedMovies = await Promise.all(baseMovies.map(fetchAndEnrichMovieData));
-  
+
   return allEnrichedMovies.filter(movie =>
     movie.genre.toLowerCase() === lowerGenre ||
     movie.genre.toLowerCase().split(',').map(g => g.trim()).includes(lowerGenre)
@@ -378,7 +378,7 @@ export const getMoviesByGenre = async (genre: string): Promise<Movie[]> => {
 export const searchMovies = async (query: string): Promise<Movie[]> => {
   await simulateDelay();
   const lowerQuery = query.toLowerCase();
-  
+
   const allMovies = await getMovies(); // This gets all movies, enriched
 
   return allMovies.filter(movie =>

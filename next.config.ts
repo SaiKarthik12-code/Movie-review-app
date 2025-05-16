@@ -30,6 +30,10 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  env: {
+    TMDB_API_KEY: 'f777c265599a9e9a59af96f3181816d5',
+    OMDB_API_KEY: 'a32dd69a',
+  },
 };
 
 export default nextConfig;
