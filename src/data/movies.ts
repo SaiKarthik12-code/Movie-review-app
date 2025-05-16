@@ -207,7 +207,8 @@ const TMDB_API_KEY = process.env.TMDB_API_KEY;
 const TMDB_API_URL_BASE = `https://api.themoviedb.org/3`;
 
 async function fetchFromOMDB(params: Record<string, string>): Promise<any> {
-  if (!OMDB_API_KEY) { // Should be caught before calling, but as a safeguard
+  if (!OMDB_API_KEY) { 
+    // This condition is logged once per app load in getMovies if key is globally missing
     return null;
   }
   const queryParams = new URLSearchParams({ ...params, apikey: OMDB_API_KEY });
@@ -219,7 +220,6 @@ async function fetchFromOMDB(params: Record<string, string>): Promise<any> {
     }
     const data = await response.json();
     if (data.Response === "False") {
-      // This means movie not found or other OMDB specific error like "Incorrect IMDb ID."
       console.warn(`OMDB API returned Response: False for params ${JSON.stringify(params)}. Error: ${data.Error}`);
       return null;
     }
@@ -231,7 +231,8 @@ async function fetchFromOMDB(params: Record<string, string>): Promise<any> {
 }
 
 async function fetchTMDBData(endpoint: string, params: Record<string, string> = {}): Promise<any> {
-  if (!TMDB_API_KEY) { // Should be caught before calling, but as a safeguard
+  if (!TMDB_API_KEY) { 
+     // This condition is logged once per app load in getMovies if key is globally missing
     return null;
   }
   const queryParams = new URLSearchParams({ ...params, api_key: TMDB_API_KEY });
@@ -289,19 +290,18 @@ function parseYear(releasedStr?: string): number | undefined {
 
 async function fetchAndEnrichMovieData(baseMovie: Movie): Promise<Movie> {
   let movie = { ...baseMovie };
-  const movieTitleForLog = movie.title; // For consistent logging
+  const movieTitleForLog = movie.title; 
 
-  // 1. Enrich with OMDB data
   if (OMDB_API_KEY && OMDB_API_KEY.trim() !== "") {
-    console.log(`OMDB: Attempting to fetch data for "${movieTitleForLog}" as OMDB_API_KEY is set.`);
+    // console.log(`OMDB: Attempting to fetch data for "${movieTitleForLog}".`); // Logged per movie previously, can be noisy
     const omdbData = await fetchFromOMDB({ t: movie.title, y: String(movie.releaseYear), plot: 'full' });
     if (omdbData) {
       movie = {
         ...movie,
         imdbID: omdbData.imdbID || movie.imdbID,
-        title: omdbData.Title || movie.title, // OMDB might have a slightly different title
+        title: omdbData.Title || movie.title,
         description: omdbData.Plot && omdbData.Plot !== "N/A" ? omdbData.Plot : movie.description,
-        genre: omdbData.Genre && omdbData.Genre !== "N/A" ? omdbData.Genre.split(',')[0].trim() : movie.genre, // Take first genre
+        genre: omdbData.Genre && omdbData.Genre !== "N/A" ? omdbData.Genre.split(',')[0].trim() : movie.genre,
         posterUrl: omdbData.Poster && omdbData.Poster !== "N/A" ? omdbData.Poster : movie.posterUrl,
         releaseYear: parseYear(omdbData.Released) || movie.releaseYear,
         rating: parseRating(omdbData.imdbRating) || movie.rating,
@@ -309,18 +309,16 @@ async function fetchAndEnrichMovieData(baseMovie: Movie): Promise<Movie> {
         director: omdbData.Director && omdbData.Director !== "N/A" ? omdbData.Director : movie.director,
         cast: omdbData.Actors && omdbData.Actors !== "N/A" ? omdbData.Actors.split(',').map((actor: string) => actor.trim()) : movie.cast,
       };
-      console.log(`OMDB: Successfully enriched "${movieTitleForLog}" with OMDB data.`);
+      // console.log(`OMDB: Successfully enriched "${movieTitleForLog}".`); // Can be noisy
     } else {
-      console.warn(`OMDB: Data not found for "${movieTitleForLog}" (API key was present, check previous logs for API errors). Using existing mock data for OMDB-specific fields.`);
+      // console.warn(`OMDB: Data not found for "${movieTitleForLog}". Using existing mock data for OMDB fields.`); // Logged per movie previously
     }
   } else {
-    console.warn(`OMDB: OMDB_API_KEY is not set or is empty. Skipping OMDB enrichment for "${movieTitleForLog}".`);
+    // This case is logged once in getMovies if key is globally missing
   }
 
-  // 2. Enrich with TMDB trailer
   if (TMDB_API_KEY && TMDB_API_KEY.trim() !== "") {
-    console.log(`TMDB: Attempting to fetch trailer for "${movieTitleForLog}" as TMDB_API_KEY is set.`);
-    // Use the (potentially OMDB-updated) title and year for TMDB search
+    // console.log(`TMDB: Attempting to fetch trailer for "${movieTitleForLog}".`); // Logged per movie previously
     const tmdbMovieId = await searchMovieOnTMDB(movie.title, movie.releaseYear);
     if (tmdbMovieId) {
       const videos = await getMovieVideosFromTMDB(tmdbMovieId);
@@ -328,42 +326,53 @@ async function fetchAndEnrichMovieData(baseMovie: Movie): Promise<Movie> {
       const trailer = officialTrailer || videos.find(v => v.site === 'YouTube' && v.type === 'Trailer');
 
       if (trailer && trailer.key) {
-        // Only update videoUrl if the current one is a placeholder or not already a YouTube URL
         const isPlaceholderVideo = !movie.videoUrl || movie.videoUrl.includes('gtv-videos-bucket/sample');
         const isAlreadyYouTube = movie.videoUrl.includes('youtube.com/embed/');
         if (isPlaceholderVideo && !isAlreadyYouTube) {
              movie.videoUrl = `https://www.youtube.com/embed/${trailer.key}`;
-             console.log(`TMDB: Trailer found and updated for "${movieTitleForLog}".`);
+             // console.log(`TMDB: Trailer updated for "${movieTitleForLog}".`); // Can be noisy
         } else if (isAlreadyYouTube) {
-            console.log(`TMDB: Trailer for "${movieTitleForLog}" is already a YouTube link. No change made.`);
+            // console.log(`TMDB: Trailer for "${movieTitleForLog}" is already YouTube. No change.`); // Can be noisy
         } else {
-            console.log(`TMDB: Trailer found for "${movieTitleForLog}", but existing non-placeholder videoUrl retained.`);
+            // console.log(`TMDB: Trailer found for "${movieTitleForLog}", but existing non-placeholder videoUrl retained.`); // Can be noisy
         }
       } else {
-        console.warn(`TMDB: No suitable YouTube trailer found for "${movieTitleForLog}" (TMDB ID: ${tmdbMovieId}).`);
+        // console.warn(`TMDB: No YouTube trailer found for "${movieTitleForLog}" (TMDB ID: ${tmdbMovieId}).`); // Logged per movie previously
       }
     } else {
-        console.warn(`TMDB: Movie ID not found on TMDB for "${movieTitleForLog}". Cannot fetch trailer.`);
+        // console.warn(`TMDB: Movie ID not found on TMDB for "${movieTitleForLog}".`); // Logged per movie previously
     }
   } else {
-      console.warn(`TMDB: TMDB_API_KEY is not set or is empty. Skipping TMDB trailer fetch for "${movieTitleForLog}".`);
+     // This case is logged once in getMovies if key is globally missing
   }
 
   return movie;
 }
 
-// Simulate API delay for all functions
-const simulateDelay = () => new Promise(resolve => setTimeout(resolve, 50)); // Keep this low for faster feedback
+const simulateDelay = () => new Promise(resolve => setTimeout(resolve, 50));
+
+let hasLoggedOMDBKeyStatus = false;
+let hasLoggedTMDBKeyStatus = false;
 
 export const getMovies = async (): Promise<Movie[]> => {
   await simulateDelay();
-  // Log only once if keys are globally unavailable
-  if (OMDB_API_KEY === undefined && TMDB_API_KEY === undefined) {
-    console.warn("OMDB_API_KEY and TMDB_API_KEY are not defined. Movie data will rely heavily on base mocks.");
-  } else if (OMDB_API_KEY === undefined) {
-    console.warn("OMDB_API_KEY is not defined. OMDB enrichment will be skipped.");
-  } else if (TMDB_API_KEY === undefined) {
-     console.warn("TMDB_API_KEY is not defined. TMDB enrichment (trailers) will be skipped.");
+  
+  if (!hasLoggedOMDBKeyStatus) {
+    if (!OMDB_API_KEY || OMDB_API_KEY.trim() === "") {
+      console.warn("OMDB_API_KEY is not defined or is empty. OMDB enrichment will be skipped for all movies.");
+    } else {
+      console.log("OMDB_API_KEY is set. Attempting OMDB enrichment.");
+    }
+    hasLoggedOMDBKeyStatus = true; // Log only once per app lifecycle (server start)
+  }
+
+  if (!hasLoggedTMDBKeyStatus) {
+    if (!TMDB_API_KEY || TMDB_API_KEY.trim() === "") {
+      console.warn("TMDB_API_KEY is not defined or is empty. TMDB trailer fetching will be skipped for all movies.");
+    } else {
+      console.log("TMDB_API_KEY is set. Attempting TMDB trailer fetching.");
+    }
+    hasLoggedTMDBKeyStatus = true; // Log only once per app lifecycle
   }
   
   const enrichedMovies = await Promise.all(baseMovies.map(fetchAndEnrichMovieData));
@@ -374,8 +383,6 @@ export const getMovieById = async (id: string): Promise<Movie | undefined> => {
   await simulateDelay();
   const baseMovieToEnrich = baseMovies.find(movie => movie.id === id);
   if (!baseMovieToEnrich) return undefined;
-  
-  // Individual movie fetching will also log issues if keys are missing, via fetchAndEnrichMovieData
   return fetchAndEnrichMovieData(baseMovieToEnrich);
 };
 
@@ -392,15 +399,31 @@ export const getMoviesByGenre = async (genre: string): Promise<Movie[]> => {
 export const searchMovies = async (query: string): Promise<Movie[]> => {
   await simulateDelay();
   const lowerQuery = query.toLowerCase();
-  const allMovies = await getMovies(); // This gets all movies, enriched
-  return allMovies.filter(movie =>
-    movie.title.toLowerCase().includes(lowerQuery) ||
-    movie.description.toLowerCase().includes(lowerQuery) ||
-    movie.genre.toLowerCase().split(',').some(g => g.trim().toLowerCase().includes(lowerQuery)) ||
-    (movie.director && movie.director.toLowerCase().includes(lowerQuery)) ||
-    (movie.cast && movie.cast.some(actor => actor.toLowerCase().includes(lowerQuery))) ||
-    (movie.imdbID && movie.imdbID.toLowerCase().includes(lowerQuery))
-  );
+  console.log(`[Search] Received query: "${query}", Lowercase: "${lowerQuery}"`);
+
+  const allMovies = await getMovies();
+  console.log(`[Search] Total movies fetched for searching: ${allMovies.length}`);
+
+  if (allMovies.length === 0) {
+    console.warn("[Search] No movies available to search. This might indicate an issue with getMovies() or baseMovies being empty.");
+  }
+
+  const results = allMovies.filter(movie => {
+    const titleMatch = movie.title.toLowerCase().includes(lowerQuery);
+    const descriptionMatch = movie.description.toLowerCase().includes(lowerQuery);
+    // Ensure movie.genre is always a string before calling toLowerCase()
+    const genreString = typeof movie.genre === 'string' ? movie.genre : '';
+    const genreMatch = genreString.toLowerCase().split(',').some(g => g.trim().toLowerCase().includes(lowerQuery));
+    
+    const directorMatch = movie.director && movie.director.toLowerCase().includes(lowerQuery);
+    const castMatch = movie.cast && movie.cast.some(actor => actor.toLowerCase().includes(lowerQuery));
+    const imdbIDMatch = movie.imdbID && movie.imdbID.toLowerCase().includes(lowerQuery);
+
+    return titleMatch || descriptionMatch || genreMatch || directorMatch || castMatch || imdbIDMatch;
+  });
+
+  console.log(`[Search] Found ${results.length} results for query "${query}"`);
+  return results;
 };
 
 export const getGenres = async (): Promise<string[]> => {
