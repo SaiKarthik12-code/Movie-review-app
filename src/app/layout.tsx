@@ -18,6 +18,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: 'MovieVerse',
   description: 'Your universe of movies, personalized for you.',
+  icons: {
+    icon: [], // Explicitly state no default icon
+    apple: [], // Explicitly state no apple touch icon
+    shortcut: [], // Explicitly state no shortcut icon
+  },
 };
 
 export default function RootLayout({
