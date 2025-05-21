@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useFavorites } from '@/hooks/use-favorites';
@@ -8,40 +9,77 @@ import { useState, useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
+import { Loader2 } from 'lucide-react';
 
 function FavoritesPageClientContent() {
-  const { favorites, isMounted } = useFavorites();
+  const { user, loading: authLoading } = useAuth();
+  const { favorites, isMounted: favoritesMounted } = useFavorites();
   const [favoriteMovies, setFavoriteMovies] = useState<Movie[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMovies, setIsLoadingMovies] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
-    if (isMounted) {
+    if (!authLoading && !user) {
+      // If auth check is done and no user, redirect to login
+      // No need to fetch favorites
+      setIsLoadingMovies(false);
+      return;
+    }
+
+    if (favoritesMounted && user) {
       const fetchFavoriteMovies = async () => {
-        setIsLoading(true);
+        setIsLoadingMovies(true);
         if (favorites.length === 0) {
           setFavoriteMovies([]);
-          setIsLoading(false);
+          setIsLoadingMovies(false);
           return;
         }
         try {
-          const moviePromises = favorites.map(id => getMovieById(id));
+          // Ensure IDs are valid before fetching
+          const validFavoriteIds = favorites.filter(id => id && typeof id === 'string');
+          const moviePromises = validFavoriteIds.map(id => getMovieById(id));
           const resolvedMoviesWithPotentialUndefined = await Promise.all(moviePromises);
-          // Filter out any undefined results (e.g., if a movie was deleted or ID was invalid)
           const validMovies = resolvedMoviesWithPotentialUndefined.filter((movie): movie is Movie => movie !== undefined);
           setFavoriteMovies(validMovies);
         } catch (error) {
           console.error("Error fetching favorite movies:", error);
-          setFavoriteMovies([]); // Clear movies on error
+          setFavoriteMovies([]); 
         } finally {
-          setIsLoading(false);
+          setIsLoadingMovies(false);
         }
       };
       fetchFavoriteMovies();
+    } else if (favoritesMounted && !user) {
+      // Clear favorites if user logs out after component is mounted
+      setFavoriteMovies([]);
+      setIsLoadingMovies(false);
     }
-  }, [favorites, isMounted]);
+  }, [user, authLoading, favorites, favoritesMounted, router]);
 
-  if (!isMounted || isLoading) {
+  if (authLoading || (!favoritesMounted && !authLoading && user)) { // Show loader if auth is loading OR if favorites not mounted yet but user exists
     return (
+      <div className="flex justify-center items-center py-20">
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!user) {
+     return (
+      <div className="text-center py-20">
+        <h2 className="text-2xl font-semibold mb-4">Login to View Favorites</h2>
+        <p className="text-muted-foreground mb-6">Please log in to see your favorite movies.</p>
+        <Button asChild>
+          <Link href="/login">Login</Link>
+        </Button>
+      </div>
+    );
+  }
+  
+  if (isLoadingMovies) {
+     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
         {Array.from({ length: favorites.length || 5 }).map((_, i) => (
           <div key={i} className="space-y-2">
@@ -66,7 +104,7 @@ function FavoritesPageClientContent() {
     );
   }
 
-  return <MovieList movies={favoriteMovies} emptyStateMessage="You haven't added any movies to your favorites yet. Or, there was an issue loading them." />;
+  return <MovieList movies={favoriteMovies} emptyStateMessage="You haven't added any movies to your favorites yet, or there was an issue loading them." />;
 }
 
 

@@ -1,9 +1,12 @@
+
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Toaster } from '@/components/ui/toaster';
+import { AuthProvider } from '@/context/AuthContext';
+import { AuthGuard } from '@/components/auth/AuthGuard';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -19,9 +22,9 @@ export const metadata: Metadata = {
   title: 'MovieVerse',
   description: 'Your universe of movies, personalized for you.',
   icons: {
-    icon: [], // Explicitly state no default icon
-    apple: [], // Explicitly state no apple touch icon
-    shortcut: [], // Explicitly state no shortcut icon
+    icon: [], 
+    apple: [], 
+    shortcut: [], 
   },
 };
 
@@ -33,12 +36,16 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}>
-        <Header />
-        <main className="flex-grow container mx-auto px-4 py-8">
-          {children}
-        </main>
-        <Footer />
-        <Toaster />
+        <AuthProvider>
+            <AuthGuard>
+              <Header />
+              <main className="flex-grow container mx-auto px-4 py-8">
+                {children}
+              </main>
+              <Footer />
+              <Toaster />
+            </AuthGuard>
+        </AuthProvider>
       </body>
     </html>
   );
