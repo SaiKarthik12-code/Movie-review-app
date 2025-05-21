@@ -1,7 +1,7 @@
 "use client";
 
 import { useFavorites } from '@/hooks/use-favorites';
-import { getMovieById, getMovies } from '@/data/movies'; // We might need getMovies to fetch all then filter if getMovieById is too slow in loop
+import { getMovieById } from '@/data/movies';
 import { MovieList } from '@/components/movies/MovieList';
 import { Movie } from '@/lib/types';
 import { useState, useEffect } from 'react';
@@ -18,12 +18,23 @@ function FavoritesPageClientContent() {
     if (isMounted) {
       const fetchFavoriteMovies = async () => {
         setIsLoading(true);
-        // In a real app, this would be a single API call: /api/movies?ids=1,2,3
-        // For mock data, we fetch all and filter, or fetch one by one (less efficient but ok for mock)
-        const allMovies = await getMovies();
-        const movies = allMovies.filter(movie => favorites.includes(movie.id));
-        setFavoriteMovies(movies);
-        setIsLoading(false);
+        if (favorites.length === 0) {
+          setFavoriteMovies([]);
+          setIsLoading(false);
+          return;
+        }
+        try {
+          const moviePromises = favorites.map(id => getMovieById(id));
+          const resolvedMoviesWithPotentialUndefined = await Promise.all(moviePromises);
+          // Filter out any undefined results (e.g., if a movie was deleted or ID was invalid)
+          const validMovies = resolvedMoviesWithPotentialUndefined.filter((movie): movie is Movie => movie !== undefined);
+          setFavoriteMovies(validMovies);
+        } catch (error) {
+          console.error("Error fetching favorite movies:", error);
+          setFavoriteMovies([]); // Clear movies on error
+        } finally {
+          setIsLoading(false);
+        }
       };
       fetchFavoriteMovies();
     }
@@ -55,7 +66,7 @@ function FavoritesPageClientContent() {
     );
   }
 
-  return <MovieList movies={favoriteMovies} emptyStateMessage="You haven't added any movies to your favorites yet." />;
+  return <MovieList movies={favoriteMovies} emptyStateMessage="You haven't added any movies to your favorites yet. Or, there was an issue loading them." />;
 }
 
 

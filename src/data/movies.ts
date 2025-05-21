@@ -7,11 +7,11 @@ const baseMovies: Movie[] = [
     id: '1',
     title: 'Inception',
     description: 'A thief who steals information by entering people\'s dreams takes on the inverse task of planting an idea into a target\'s subconscious.',
-    genre: 'Sci-Fi',
+    genre: 'Sci-Fi,Action', // TMDB genres for Inception: Action, Science Fiction, Adventure
     posterUrl: 'https://placehold.co/300x450.png',
     videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
     releaseYear: 2010,
-    rating: 4.8,
+    rating: 8.8, // IMDb rating
     durationMinutes: 148,
     director: 'Christopher Nolan',
     cast: ['Leonardo DiCaprio', 'Joseph Gordon-Levitt', 'Elliot Page'],
@@ -24,7 +24,7 @@ const baseMovies: Movie[] = [
     posterUrl: 'https://placehold.co/300x450.png',
     videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
     releaseYear: 1994,
-    rating: 4.9,
+    rating: 9.3, // IMDb rating
     durationMinutes: 142,
     director: 'Frank Darabont',
     cast: ['Tim Robbins', 'Morgan Freeman', 'Bob Gunton'],
@@ -33,11 +33,11 @@ const baseMovies: Movie[] = [
     id: '3',
     title: 'The Dark Knight',
     description: 'When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological and physical tests of his ability to fight injustice.',
-    genre: 'Action',
+    genre: 'Action,Crime,Drama',
     posterUrl: 'https://placehold.co/300x450.png',
     videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
     releaseYear: 2008,
-    rating: 4.9,
+    rating: 9.0, // IMDb rating
     durationMinutes: 152,
     director: 'Christopher Nolan',
     cast: ['Christian Bale', 'Heath Ledger', 'Aaron Eckhart'],
@@ -46,11 +46,11 @@ const baseMovies: Movie[] = [
     id: '4',
     title: 'Pulp Fiction',
     description: 'The lives of two mob hitmen, a boxer, a gangster and his wife, and a pair of diner bandits intertwine in four tales of violence and redemption.',
-    genre: 'Crime',
+    genre: 'Crime,Drama',
     posterUrl: 'https://placehold.co/300x450.png',
     videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
     releaseYear: 1994,
-    rating: 4.7,
+    rating: 8.9, // IMDb rating
     durationMinutes: 154,
     director: 'Quentin Tarantino',
     cast: ['John Travolta', 'Uma Thurman', 'Samuel L. Jackson'],
@@ -59,11 +59,11 @@ const baseMovies: Movie[] = [
     id: '5',
     title: 'Forrest Gump',
     description: 'The presidencies of Kennedy and Johnson, the Vietnam War, the Watergate scandal and other historical events unfold from the perspective of an Alabama man with an IQ of 75, whose only desire is to be reunited with his childhood sweetheart.',
-    genre: 'Drama',
+    genre: 'Drama,Romance',
     posterUrl: 'https://placehold.co/300x450.png',
     videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
     releaseYear: 1994,
-    rating: 4.8,
+    rating: 8.8, // IMDb rating
     durationMinutes: 142,
     director: 'Robert Zemeckis',
     cast: ['Tom Hanks', 'Robin Wright', 'Gary Sinise'],
@@ -72,11 +72,11 @@ const baseMovies: Movie[] = [
     id: '6',
     title: 'The Matrix',
     description: 'A computer hacker learns from mysterious rebels about the true nature of his reality and his role in the war against its controllers.',
-    genre: 'Sci-Fi',
+    genre: 'Action,Sci-Fi',
     posterUrl: 'https://placehold.co/300x450.png',
     videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
     releaseYear: 1999,
-    rating: 4.7,
+    rating: 8.7, // IMDb rating
     durationMinutes: 136,
     director: 'Lana Wachowski, Lilly Wachowski',
     cast: ['Keanu Reeves', 'Laurence Fishburne', 'Carrie-Anne Moss'],
@@ -85,11 +85,11 @@ const baseMovies: Movie[] = [
     id: '7',
     title: 'Spirited Away',
     description: 'During her family\'s move to the suburbs, a sullen 10-year-old girl wanders into a world ruled by gods, witches, and spirits, and where humans are changed into beasts.',
-    genre: 'Animation',
+    genre: 'Animation,Adventure,Family',
     posterUrl: 'https://placehold.co/300x450.png',
     videoUrl: 'https://www.youtube.com/embed/ByXuk9QqQkk',
     releaseYear: 2001,
-    rating: 4.8,
+    rating: 8.6, // IMDb rating
     durationMinutes: 125,
     director: 'Hayao Miyazaki',
     cast: ['Rumi Hiiragi', 'Miyu Irino', 'Mari Natsuki'],
@@ -98,11 +98,11 @@ const baseMovies: Movie[] = [
     id: '8',
     title: 'Parasite',
     description: 'Greed and class discrimination threaten the newly formed symbiotic relationship between the wealthy Park family and the destitute Kim clan.',
-    genre: 'Thriller', // Changed from Drama to Thriller to match user's intent in earlier prompts
+    genre: 'Thriller,Comedy,Drama', 
     posterUrl: 'https://placehold.co/300x450.png',
     videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4',
     releaseYear: 2019,
-    rating: 4.6,
+    rating: 8.5, // IMDb rating
     durationMinutes: 132,
     director: 'Bong Joon Ho',
     cast: ['Song Kang-ho', 'Lee Sun-kyun', 'Cho Yeo-jeong'],
@@ -111,11 +111,11 @@ const baseMovies: Movie[] = [
     id: '9',
     title: 'The Grand Budapest Hotel',
     description: 'The adventures of Gustave H, a legendary concierge at a famous hotel from the fictional Republic of Zubrowka between the first and second World Wars, and Zero Moustafa, the lobby boy who becomes his most trusted friend.',
-    genre: 'Comedy',
+    genre: 'Comedy,Drama,Adventure',
     posterUrl: 'https://placehold.co/300x450.png',
     videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
     releaseYear: 2014,
-    rating: 4.5,
+    rating: 8.1, // IMDb rating
     durationMinutes: 99,
     director: 'Wes Anderson',
     cast: ['Ralph Fiennes', 'F. Murray Abraham', 'Mathieu Amalric'],
@@ -124,11 +124,11 @@ const baseMovies: Movie[] = [
     id: '10',
     title: 'Mad Max: Fury Road',
     description: 'In a post-apocalyptic wasteland, a woman rebels against a tyrannical ruler in search for her homeland with the help of a group of female prisoners, a psychotic worshiper, and a drifter named Max.',
-    genre: 'Action',
+    genre: 'Action,Adventure,Sci-Fi',
     posterUrl: 'https://placehold.co/300x450.png',
     videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4',
     releaseYear: 2015,
-    rating: 4.7,
+    rating: 8.1, // IMDb rating
     durationMinutes: 120,
     director: 'George Miller',
     cast: ['Tom Hardy', 'Charlize Theron', 'Nicholas Hoult'],
@@ -137,11 +137,11 @@ const baseMovies: Movie[] = [
     id: '11',
     title: 'Interstellar',
     description: 'A team of explorers travel through a wormhole in space in an attempt to ensure humanity\'s survival.',
-    genre: 'Sci-Fi', // Was Adventure, TMDB and common consensus is Sci-Fi
+    genre: 'Sci-Fi,Drama,Adventure',
     posterUrl: 'https://placehold.co/300x450.png',
     videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
     releaseYear: 2014,
-    rating: 4.8,
+    rating: 8.7, // IMDb rating
     durationMinutes: 169,
     director: 'Christopher Nolan',
     cast: ['Matthew McConaughey', 'Anne Hathaway', 'Jessica Chastain'],
@@ -150,11 +150,11 @@ const baseMovies: Movie[] = [
     id: '12',
     title: 'Whiplash',
     description: 'A promising young drummer enrolls at a cut-throat music conservatory where his dreams of greatness are mentored by an instructor who will stop at nothing to realize a student\'s potential.',
-    genre: 'Drama',
+    genre: 'Drama,Music',
     posterUrl: 'https://placehold.co/300x450.png',
     videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
     releaseYear: 2014,
-    rating: 4.7,
+    rating: 8.5, // IMDb rating
     durationMinutes: 106,
     director: 'Damien Chazelle',
     cast: ['Miles Teller', 'J.K. Simmons', 'Melissa Benoist'],
@@ -163,11 +163,11 @@ const baseMovies: Movie[] = [
     id: '13',
     title: 'Coco',
     description: 'Aspiring musician Miguel, confronted with his family\'s ancestral ban on music, enters the Land of the Dead to find his great-great-grandfather, a legendary singer.',
-    genre: 'Animation',
+    genre: 'Animation,Adventure,Family',
     posterUrl: 'https://placehold.co/300x450.png',
     videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
     releaseYear: 2017,
-    rating: 4.7,
+    rating: 8.4, // IMDb rating
     durationMinutes: 105,
     director: 'Lee Unkrich, Adrian Molina',
     cast: ['Anthony Gonzalez', 'Gael García Bernal', 'Benjamin Bratt'],
@@ -176,11 +176,11 @@ const baseMovies: Movie[] = [
     id: '14',
     title: 'Joker',
     description: 'In Gotham City, mentally troubled comedian Arthur Fleck is disregarded and mistreated by society. He then embarks on a downward spiral of revolution and bloody crime. This path brings him face-to-face with his alter-ego: the Joker.',
-    genre: 'Thriller', // Was Crime, TMDB often lists as Drama/Thriller/Crime. Thriller is a good primary.
+    genre: 'Thriller,Crime,Drama',
     posterUrl: 'https://placehold.co/300x450.png',
     videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4',
     releaseYear: 2019,
-    rating: 4.6,
+    rating: 8.3, // IMDb rating, was 8.4
     durationMinutes: 122,
     director: 'Todd Phillips',
     cast: ['Joaquin Phoenix', 'Robert De Niro', 'Zazie Beetz'],
@@ -189,11 +189,11 @@ const baseMovies: Movie[] = [
     id: '15',
     title: 'Avengers: Endgame',
     description: 'After the devastating events of Avengers: Infinity War (2018), the universe is in ruins. With the help of remaining allies, the Avengers assemble once more in order to reverse Thanos\' actions and restore balance to the universe.',
-    genre: 'Action',
+    genre: 'Action,Adventure,Sci-Fi',
     posterUrl: 'https://placehold.co/300x450.png',
     videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
     releaseYear: 2019,
-    rating: 4.8,
+    rating: 8.4, // IMDb rating
     durationMinutes: 181,
     director: 'Anthony Russo, Joe Russo',
     cast: ['Robert Downey Jr.', 'Chris Evans', 'Mark Ruffalo'],
@@ -208,10 +208,12 @@ const TMDB_API_URL_BASE = `https://api.themoviedb.org/3`;
 
 async function fetchFromOMDB(params: Record<string, string>): Promise<any> {
   if (!OMDB_API_KEY) {
+    // console.log("OMDB_API_KEY not available, skipping OMDB fetch.");
     return null;
   }
   const queryParams = new URLSearchParams({ ...params, apikey: OMDB_API_KEY });
   try {
+    // console.log(`Fetching from OMDB: ${OMDB_API_URL}?${queryParams}`);
     const response = await fetch(`${OMDB_API_URL}?${queryParams}`);
     if (!response.ok) {
       console.error(`OMDB API error for params ${JSON.stringify(params)}: ${response.statusText} (Status: ${response.status})`);
@@ -219,9 +221,10 @@ async function fetchFromOMDB(params: Record<string, string>): Promise<any> {
     }
     const data = await response.json();
     if (data.Response === "False") {
-      console.warn(`OMDB API returned Response: False for params ${JSON.stringify(params)}. Error: ${data.Error}`);
+      // console.warn(`OMDB API returned Response: False for params ${JSON.stringify(params)}. Error: ${data.Error}`);
       return null;
     }
+    // console.log(`OMDB Data received for ${params.t || params.i}:`, data.Title);
     return data;
   } catch (error) {
     console.error(`Network error fetching from OMDB for params ${JSON.stringify(params)}:`, error);
@@ -231,41 +234,50 @@ async function fetchFromOMDB(params: Record<string, string>): Promise<any> {
 
 async function fetchTMDBData(endpoint: string, params: Record<string, string> = {}): Promise<any> {
   if (!TMDB_API_KEY) {
+    // console.log("TMDB_API_KEY not available, skipping TMDB fetch.");
     return null;
   }
-  const queryParams = new URLSearchParams({ ...params, api_key: TMDB_API_KEY });
+  const queryParams = new URLSearchParams({ ...params, api_key: TMDB_API_KEY, language: 'en-US' });
   try {
+    // console.log(`Fetching from TMDB: ${TMDB_API_URL_BASE}${endpoint}?${queryParams}`);
     const response = await fetch(`${TMDB_API_URL_BASE}${endpoint}?${queryParams}`);
     if (!response.ok) {
       console.error(`TMDB API error for endpoint ${endpoint} with params ${JSON.stringify(params)}: ${response.statusText} (Status: ${response.status})`);
       return null;
     }
-    return await response.json();
+    const data = await response.json();
+    // console.log(`TMDB Data received for ${endpoint}:`, endpoint.includes('search') ? `${data.results?.length} results` : data.title || data.name);
+    return data;
   } catch (error) {
     console.error(`Network error fetching from TMDB for endpoint ${endpoint} with params ${JSON.stringify(params)}:`, error);
     return null;
   }
 }
 
-async function searchMovieOnTMDB(title: string, year?: number): Promise<number | null> {
-  const params: Record<string, string> = { query: title };
-  if (year) {
-    params.year = String(year);
+let tmdbGenresMap: Record<number, string> | null = null;
+
+async function getTMDBGenresMap(): Promise<Record<number, string>> {
+  if (tmdbGenresMap) {
+    return tmdbGenresMap;
   }
-  const data = await fetchTMDBData('/search/movie', params);
-  if (data && data.results && data.results.length > 0) {
-    const movieResult = year
-      ? data.results.find((m: any) => m.release_date && new Date(m.release_date).getFullYear() === year)
-      : data.results[0];
-    return movieResult ? movieResult.id : (data.results[0]?.id || null);
+  if (!TMDB_API_KEY) {
+    console.warn("TMDB_API_KEY not available, cannot fetch genres.");
+    return {};
   }
-  return null;
+  console.log("[Genres] Fetching TMDB genres map.");
+  const data = await fetchTMDBData('/genre/movie/list');
+  if (data && data.genres) {
+    tmdbGenresMap = data.genres.reduce((acc: Record<number, string>, genre: any) => {
+      acc[genre.id] = genre.name;
+      return acc;
+    }, {});
+    console.log("[Genres] TMDB genres map fetched and cached.");
+    return tmdbGenresMap;
+  }
+  console.warn("[Genres] Failed to fetch TMDB genres map.");
+  return {};
 }
 
-async function getMovieVideosFromTMDB(tmdbMovieId: number): Promise<any[]> {
-  const data = await fetchTMDBData(`/movie/${tmdbMovieId}/videos`);
-  return (data && data.results) ? data.results : [];
-}
 
 function parseDuration(runtimeStr?: string): number | undefined {
   if (!runtimeStr || runtimeStr === "N/A") return undefined;
@@ -273,70 +285,109 @@ function parseDuration(runtimeStr?: string): number | undefined {
   return isNaN(minutes) ? undefined : minutes;
 }
 
-function parseRating(imdbRatingStr?: string): number | undefined {
-  if (!imdbRatingStr || imdbRatingStr === "N/A") return undefined;
-  const rating = parseFloat(imdbRatingStr);
+function parseRating(ratingStr?: string): number | undefined {
+  if (!ratingStr || ratingStr === "N/A") return undefined;
+  const rating = parseFloat(ratingStr);
   return isNaN(rating) ? undefined : rating;
 }
 
-function parseYear(releasedStr?: string): number | undefined {
-    if (!releasedStr || releasedStr === "N/A") return undefined;
-    // Handle cases like "01 Jan 1994" or just "1994"
-    const yearMatch = releasedStr.match(/\d{4}/);
-    if (yearMatch) {
-        const year = parseInt(yearMatch[0]);
-        return isNaN(year) || year < 1800 || year > new Date().getFullYear() + 5 ? undefined : year;
+function parseYear(yearStr?: string | number): number {
+    if (!yearStr || yearStr === "N/A") return 0;
+    if (typeof yearStr === 'number') {
+        return (yearStr > 1800 && yearStr < new Date().getFullYear() + 10) ? yearStr : 0;
     }
-    // Fallback for simple year strings if direct parsing fails.
-    const simpleYear = parseInt(releasedStr);
-     if (!isNaN(simpleYear) && simpleYear > 1800 && simpleYear < new Date().getFullYear() + 5) {
-        return simpleYear;
+    // Handles "YYYY-MM-DD" or "YYYY"
+    const match = yearStr.match(/^(\d{4})/);
+    if (match && match[1]) {
+        const year = parseInt(match[1], 10);
+        return (year > 1800 && year < new Date().getFullYear() + 10) ? year : 0;
     }
-    // Final attempt with Date parsing if it's a fuller date string
-    const date = new Date(releasedStr);
-    const fullYear = date.getFullYear();
-    return isNaN(fullYear) || fullYear < 1800 || fullYear > new Date().getFullYear() + 5 ? undefined : fullYear;
+    const parsedDateYear = new Date(yearStr).getFullYear();
+    if (!isNaN(parsedDateYear) && parsedDateYear > 1800 && parsedDateYear < new Date().getFullYear() + 10) {
+        return parsedDateYear;
+    }
+    return 0;
 }
+
+async function transformTMDBMovieToAppMovie(tmdbId: string | number, genresMap: Record<number, string>): Promise<Movie | undefined> {
+  if (!TMDB_API_KEY) return undefined;
+
+  console.log(`[TMDB Detail] Fetching full details for TMDB ID: ${tmdbId}`);
+  const movieDetails = await fetchTMDBData(`/movie/${tmdbId}`);
+  if (!movieDetails) return undefined;
+
+  const credits = await fetchTMDBData(`/movie/${tmdbId}/credits`);
+  const videos = await fetchTMDBData(`/movie/${tmdbId}/videos`);
+
+  const director = credits?.crew?.find((person: any) => person.job === 'Director')?.name;
+  const cast = credits?.cast?.slice(0, 5).map((actor: any) => actor.name) || [];
+  
+  const officialTrailer = videos?.results?.find((v: any) => v.site === 'YouTube' && v.type === 'Trailer' && v.official === true);
+  const trailer = officialTrailer || videos?.results?.find((v: any) => v.site === 'YouTube' && v.type === 'Trailer');
+  const videoUrl = trailer?.key ? `https://www.youtube.com/embed/${trailer.key}` : 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
+
+  return {
+    id: String(movieDetails.id),
+    imdbID: movieDetails.imdb_id,
+    title: movieDetails.title || 'N/A',
+    description: movieDetails.overview || 'No description available.',
+    genre: movieDetails.genres?.map((g: any) => g.name).join(', ') || 'N/A',
+    posterUrl: movieDetails.poster_path ? `https://image.tmdb.org/t/p/w500${movieDetails.poster_path}` : 'https://placehold.co/300x450.png',
+    videoUrl,
+    releaseYear: parseYear(movieDetails.release_date),
+    rating: parseFloat((movieDetails.vote_average || 0).toFixed(1)), // TMDB rating is 0-10
+    durationMinutes: movieDetails.runtime || undefined,
+    director: director || undefined,
+    cast: cast.length > 0 ? cast : undefined,
+  };
+}
+
 
 async function fetchAndEnrichMovieData(baseMovie: Movie): Promise<Movie> {
   let movie = { ...baseMovie };
 
   if (OMDB_API_KEY && OMDB_API_KEY.trim() !== "") {
-    const omdbData = await fetchFromOMDB({ t: movie.title, y: String(movie.releaseYear), plot: 'full' });
-    if (omdbData) {
-      movie = {
-        ...movie,
-        imdbID: omdbData.imdbID || movie.imdbID,
-        title: (omdbData.Title && omdbData.Title !== "N/A") ? omdbData.Title : movie.title,
-        description: (omdbData.Plot && omdbData.Plot !== "N/A") ? omdbData.Plot : movie.description,
-        genre: (omdbData.Genre && omdbData.Genre !== "N/A") ? omdbData.Genre.split(',')[0].trim() : movie.genre,
-        posterUrl: (omdbData.Poster && omdbData.Poster !== "N/A") ? omdbData.Poster : movie.posterUrl,
-        releaseYear: parseYear(omdbData.Released) || movie.releaseYear,
-        rating: parseRating(omdbData.imdbRating) || movie.rating,
-        durationMinutes: parseDuration(omdbData.Runtime) || movie.durationMinutes,
-        director: (omdbData.Director && omdbData.Director !== "N/A") ? omdbData.Director : movie.director,
-        cast: (omdbData.Actors && omdbData.Actors !== "N/A") ? omdbData.Actors.split(',').map((actor: string) => actor.trim()) : movie.cast,
-      };
+    const omdbParams: Record<string, string> = { plot: 'full' };
+    if (movie.imdbID) omdbParams.i = movie.imdbID;
+    else if (movie.title) {
+      omdbParams.t = movie.title;
+      if (movie.releaseYear) omdbParams.y = String(movie.releaseYear);
+    }
+
+    if (omdbParams.t || omdbParams.i) {
+        const omdbData = await fetchFromOMDB(omdbParams);
+        if (omdbData) {
+          movie = {
+            ...movie,
+            imdbID: omdbData.imdbID || movie.imdbID,
+            title: (omdbData.Title && omdbData.Title !== "N/A") ? omdbData.Title : movie.title,
+            description: (omdbData.Plot && omdbData.Plot !== "N/A") ? omdbData.Plot : movie.description,
+            genre: (omdbData.Genre && omdbData.Genre !== "N/A") ? omdbData.Genre.split(',').map((g:string)=>g.trim()).slice(0,2).join(',') : movie.genre,
+            posterUrl: (omdbData.Poster && omdbData.Poster !== "N/A") ? omdbData.Poster : movie.posterUrl,
+            releaseYear: parseYear(omdbData.Released) || movie.releaseYear,
+            rating: parseRating(omdbData.imdbRating) || movie.rating,
+            durationMinutes: parseDuration(omdbData.Runtime) || movie.durationMinutes,
+            director: (omdbData.Director && omdbData.Director !== "N/A") ? omdbData.Director : movie.director,
+            cast: (omdbData.Actors && omdbData.Actors !== "N/A") ? omdbData.Actors.split(',').map((actor: string) => actor.trim()) : movie.cast,
+          };
+        }
     }
   }
 
-  if (TMDB_API_KEY && TMDB_API_KEY.trim() !== "") {
-    const tmdbMovieId = await searchMovieOnTMDB(movie.title, movie.releaseYear);
-    if (tmdbMovieId) {
-      const videos = await getMovieVideosFromTMDB(tmdbMovieId);
-      const officialTrailer = videos.find(v => v.site === 'YouTube' && v.type === 'Trailer' && v.official === true);
-      const trailer = officialTrailer || videos.find(v => v.site === 'YouTube' && v.type === 'Trailer');
+  if (TMDB_API_KEY && TMDB_API_KEY.trim() !== "" && (!movie.videoUrl || movie.videoUrl.includes('gtv-videos-bucket/sample') || movie.videoUrl.includes('placehold.co'))) {
+    const tmdbMovieId = movie.imdbID 
+      ? (await fetchTMDBData(`/find/${movie.imdbID}`, { external_source: 'imdb_id' }))?.movie_results?.[0]?.id
+      : (await fetchTMDBData('/search/movie', { query: movie.title, year: String(movie.releaseYear) }))?.results?.[0]?.id;
 
-      if (trailer && trailer.key) {
-        const isPlaceholderVideo = !movie.videoUrl || movie.videoUrl.includes('gtv-videos-bucket/sample');
-        const isAlreadyYouTube = movie.videoUrl && movie.videoUrl.includes('youtube.com/embed/');
-        if (isPlaceholderVideo && !isAlreadyYouTube) {
-             movie.videoUrl = `https://www.youtube.com/embed/${trailer.key}`;
-        }
+    if (tmdbMovieId) {
+      const videos = await fetchTMDBData(`/movie/${tmdbMovieId}/videos`);
+      const officialTrailer = videos?.results?.find((v:any) => v.site === 'YouTube' && v.type === 'Trailer' && v.official === true);
+      const trailer = officialTrailer || videos?.results?.find((v:any) => v.site === 'YouTube' && v.type === 'Trailer');
+      if (trailer?.key) {
+        movie.videoUrl = `https://www.youtube.com/embed/${trailer.key}`;
       }
     }
   }
-
   return movie;
 }
 
@@ -349,46 +400,45 @@ export const getMovies = async (): Promise<Movie[]> => {
   await simulateDelay();
 
   if (!hasLoggedOMDBKeyStatus) {
-    if (!OMDB_API_KEY || OMDB_API_KEY.trim() === "") {
-      console.warn("OMDB_API_KEY is not defined or is empty. OMDB enrichment will be skipped for all movies.");
-    } else {
-      // console.log("OMDB_API_KEY is set. Attempting OMDB enrichment.");
-    }
+    console.log(OMDB_API_KEY && OMDB_API_KEY.trim() !== "" ? "[OMDB] Key found. OMDB enrichment will be attempted." : "[OMDB] Key NOT found or empty. OMDB enrichment will be skipped.");
     hasLoggedOMDBKeyStatus = true;
   }
 
   if (!hasLoggedTMDBKeyStatus) {
-    if (!TMDB_API_KEY || TMDB_API_KEY.trim() === "") {
-      console.warn("TMDB_API_KEY is not defined or is empty. TMDB trailer fetching will be skipped for all movies.");
-    } else {
-      // console.log("TMDB_API_KEY is set. Attempting TMDB trailer fetching.");
-    }
+    console.log(TMDB_API_KEY && TMDB_API_KEY.trim() !== "" ? "[TMDB] Key found. TMDB functionalities will be attempted." : "[TMDB] Key NOT found or empty. TMDB functionalities will be skipped.");
     hasLoggedTMDBKeyStatus = true;
   }
-
+  // console.log("[getMovies] Enriching base movies list.");
   const enrichedMovies = await Promise.all(baseMovies.map(fetchAndEnrichMovieData));
+  // console.log(`[getMovies] Finished enriching. Total movies: ${enrichedMovies.length}`);
   return enrichedMovies;
 };
 
 export const getMovieById = async (id: string): Promise<Movie | undefined> => {
   await simulateDelay();
+  console.log(`[getMovieById] Requested ID: ${id}`);
+
+  // Check if ID is purely numeric (potential TMDB ID)
+  if (/^\d+$/.test(id) && TMDB_API_KEY) {
+    console.log(`[getMovieById] ID ${id} is numeric, attempting TMDB fetch.`);
+    const genresMap = await getTMDBGenresMap();
+    const tmdbMovie = await transformTMDBMovieToAppMovie(id, genresMap);
+    if (tmdbMovie) {
+      console.log(`[getMovieById] Found movie in TMDB: ${tmdbMovie.title}`);
+      return tmdbMovie;
+    }
+    console.warn(`[getMovieById] Movie with TMDB ID ${id} not found via TMDB API, or API key missing.`);
+  }
+  
+  // Fallback to original baseMovies logic
+  console.log(`[getMovieById] ID ${id} not TMDB numeric or TMDB fetch failed, checking baseMovies.`);
   const baseMovieToEnrich = baseMovies.find(movie => movie.id === id);
-  if (!baseMovieToEnrich) return undefined;
+  if (!baseMovieToEnrich) {
+    console.warn(`[getMovieById] Movie with ID ${id} not found in baseMovies.`);
+    return undefined;
+  }
+  console.log(`[getMovieById] Found movie in baseMovies: ${baseMovieToEnrich.title}. Enriching...`);
   return fetchAndEnrichMovieData(baseMovieToEnrich);
-};
-
-export const getMoviesByGenre = async (genre: string): Promise<Movie[]> => {
-  await simulateDelay();
-  const lowerGenre = genre.toLowerCase();
-
-  const moviesInGenre = baseMovies.filter(movie => {
-    const currentMovieGenre = (movie.genre || '').toLowerCase();
-    return currentMovieGenre === lowerGenre ||
-           currentMovieGenre.split(',').map(g => g.trim()).includes(lowerGenre);
-  });
-
-  const enrichedMoviesInGenre = await Promise.all(moviesInGenre.map(fetchAndEnrichMovieData));
-  return enrichedMoviesInGenre;
 };
 
 export const searchMovies = async (query: string): Promise<Movie[]> => {
@@ -396,36 +446,88 @@ export const searchMovies = async (query: string): Promise<Movie[]> => {
   const lowerQuery = query.toLowerCase();
   console.log(`[Search] Received query: "${query}", Lowercase: "${lowerQuery}"`);
 
-  const allMovies = await getMovies();
-  console.log(`[Search] Total movies fetched for searching: ${allMovies.length}`);
+  if (!TMDB_API_KEY) {
+    console.warn("[Search] TMDB_API_KEY is not available. Search will be empty.");
+    return [];
+  }
 
-  const results = allMovies.filter(movie => {
-    const titleMatch = (movie.title || '').toLowerCase().includes(lowerQuery);
-    const descriptionMatch = (movie.description || '').toLowerCase().includes(lowerQuery);
-    const genreString = typeof movie.genre === 'string' ? movie.genre : (Array.isArray(movie.genre) ? movie.genre.join(' ') : '');
-    const genreMatch = genreString.toLowerCase().split(',').some(g => g.trim().toLowerCase().includes(lowerQuery));
-    const directorMatch = movie.director && (movie.director || '').toLowerCase().includes(lowerQuery);
-    const castMatch = movie.cast && movie.cast.some(actor => (actor || '').toLowerCase().includes(lowerQuery));
-    const imdbIDMatch = movie.imdbID && (movie.imdbID || '').toLowerCase().includes(lowerQuery);
+  const genresMap = await getTMDBGenresMap();
+  const searchData = await fetchTMDBData('/search/movie', { query, include_adult: 'false' });
 
-    return titleMatch || descriptionMatch || genreMatch || directorMatch || castMatch || imdbIDMatch;
+  if (searchData && searchData.results) {
+    console.log(`[Search] TMDB API returned ${searchData.results.length} results for query "${query}".`);
+    const movies: Movie[] = searchData.results.map((tmdbMovie: any): Movie => {
+      const genreNames = tmdbMovie.genre_ids?.map((id: number) => genresMap[id]).filter(Boolean).slice(0, 2).join(', ') || 'N/A';
+      return {
+        id: String(tmdbMovie.id),
+        title: tmdbMovie.title || "N/A",
+        description: tmdbMovie.overview || 'No description available.',
+        posterUrl: tmdbMovie.poster_path ? `https://image.tmdb.org/t/p/w500${tmdbMovie.poster_path}` : 'https://placehold.co/300x450.png',
+        releaseYear: parseYear(tmdbMovie.release_date),
+        rating: parseFloat((tmdbMovie.vote_average || 0).toFixed(1)), // TMDB rating is 0-10
+        genre: genreNames,
+        videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', // Placeholder
+        // These fields will be populated by getMovieById if the detail page is visited
+        durationMinutes: undefined, 
+        director: undefined,
+        cast: undefined,
+        imdbID: undefined, 
+      };
+    }).filter((movie: Movie) => movie.title !== "N/A" && movie.releaseYear !== 0); // Filter out results with no title or year
+    
+    console.log(`[Search] Mapped ${movies.length} valid movies for query "${query}".`);
+    return movies;
+  }
+  console.warn(`[Search] No results or error from TMDB API for query "${query}".`);
+  return [];
+};
+
+
+export const getMoviesByGenre = async (genre: string): Promise<Movie[]> => {
+  await simulateDelay();
+  const lowerGenre = genre.toLowerCase();
+  console.log(`[getMoviesByGenre] Requested genre: ${genre}`);
+
+  const moviesInGenre = baseMovies.filter(movie => {
+    const currentMovieGenre = (movie.genre || '').toLowerCase();
+    return currentMovieGenre === lowerGenre ||
+           currentMovieGenre.split(',').map(g => g.trim()).includes(lowerGenre);
   });
+  
+  if (moviesInGenre.length === 0) {
+    console.log(`[getMoviesByGenre] No movies found in baseMovies for genre: ${genre}. Consider TMDB genre search if needed.`);
+    // Potentially, you could add a TMDB search by genre here if baseMovies yield no results.
+    // For now, it only searches baseMovies for genre pages.
+    return [];
+  }
 
-  console.log(`[Search] Found ${results.length} results for query "${query}"`);
-  return results;
+  // console.log(`[getMoviesByGenre] Found ${moviesInGenre.length} movies in base for genre ${genre}. Enriching...`);
+  const enrichedMoviesInGenre = await Promise.all(moviesInGenre.map(fetchAndEnrichMovieData));
+  return enrichedMoviesInGenre;
 };
 
 export const getGenres = async (): Promise<string[]> => {
   await simulateDelay();
-  const allMovies = await getMovies(); // Use enriched movies to get the most accurate genre list
+  // For site navigation, using TMDB genres is more comprehensive
+  if (TMDB_API_KEY) {
+    const genresMap = await getTMDBGenresMap();
+    const genreNames = Object.values(genresMap);
+    if (genreNames.length > 0) {
+      console.log("[getGenres] Returning genres from TMDB.");
+      return genreNames.sort();
+    }
+  }
+  // Fallback to genres from baseMovies if TMDB fails or key not present
+  console.log("[getGenres] Falling back to genres from baseMovies.");
+  const allMovies = await getMovies(); // Uses enriched movies to get the most accurate genre list
   const genres = new Set<string>();
   allMovies.forEach(movie => {
     if (movie.genre) {
-      movie.genre.split(',').forEach(g => genres.add(g.trim()));
+      movie.genre.split(',').forEach(g => {
+        const trimmedGenre = g.trim();
+        if (trimmedGenre) genres.add(trimmedGenre);
+      });
     }
   });
   return Array.from(genres).filter(g => g).sort();
 };
-
-
-    
