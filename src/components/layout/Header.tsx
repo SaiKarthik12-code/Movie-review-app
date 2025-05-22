@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from 'next/link';
@@ -106,7 +105,7 @@ export function Header() {
               aria-label="Search movies"
             />
             <Button type="submit" variant="default" className="rounded-l-none h-9 sm:h-10" aria-label="Submit search">
-              <SearchIcon size={18} sm:size={20} />
+              <SearchIcon className="h-[18px] w-[18px] sm:h-[20px] sm:w-[20px]" />
             </Button>
           </form>
         )}
