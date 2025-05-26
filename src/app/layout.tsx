@@ -18,10 +18,14 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 });
 
+// Read the site URL from environment variables, with a fallback for safety
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:9002';
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl), // Set the base URL for metadata
   title: 'MovieVerse',
   description: 'Your universe of movies, personalized for you.',
-  icons: {
+  icons: { // Explicitly set icons to empty arrays to prevent Next.js from auto-discovering potentially problematic ones
     icon: [], 
     apple: [], 
     shortcut: [], 
