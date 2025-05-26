@@ -1,11 +1,10 @@
-
 "use client";
 
 import { Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useFavorites } from '@/hooks/use-favorites';
 import { cn } from '@/lib/utils';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react'; // Keep useEffect if needed for other side effects
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
@@ -19,24 +18,25 @@ interface FavoriteButtonProps {
 export function FavoriteButton({ movieId, movieTitle, className }: FavoriteButtonProps) {
   const { user, loading: authLoading } = useAuth();
   const { isFavorite, toggleFavorite, isMounted } = useFavorites();
-  const [isFav, setIsFav] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
 
+  // Directly use the favorite status from the hook
+  const isFav = isFavorite(movieId);
+
+  // useEffect is no longer needed for state synchronization,
+  // but can be kept for other purposes if necessary.
   useEffect(() => {
-    if (isMounted && user) { // Only check/set favorite status if user is logged in
-      setIsFav(isFavorite(movieId));
-    } else if (isMounted && !user) {
-      setIsFav(false); // Not favorited if not logged in
-    }
-  }, [isMounted, isFavorite, movieId, user]);
-  
+    // Example: log favorite status when it changes
+    // console.log(`Favorite status for ${movieTitle} (${movieId}): ${isFav}`);
+  }, [isFav, movieId, movieTitle]); // Depend on isFav
+
   if (!isMounted || authLoading) {
     return <Button variant="ghost" size="icon" className={cn("text-muted-foreground", className)} disabled><Heart size={24} /></Button>;
   }
 
   const handleToggleFavorite = (e: React.MouseEvent) => {
-    e.preventDefault(); 
+    e.preventDefault();
     e.stopPropagation();
 
     if (!user) {
@@ -52,8 +52,11 @@ export function FavoriteButton({ movieId, movieTitle, className }: FavoriteButto
       return;
     }
 
-    toggleFavorite(movieId, movieTitle); // This already handles toast internally
-    setIsFav(prev => !prev); 
+    // toggleFavorite updates the global state in useFavorites.
+    // This will cause a re-render, and the `isFav` variable above will automatically
+    // reflect the updated favorite status.
+    toggleFavorite(movieId, movieTitle);
+    // Removed the local setIsFav call
   };
 
   return (
@@ -63,6 +66,7 @@ export function FavoriteButton({ movieId, movieTitle, className }: FavoriteButto
       onClick={handleToggleFavorite}
       className={cn(
         "transition-colors duration-200 ease-in-out",
+        // isFav is now directly from the hook
         isFav && user ? "text-destructive hover:text-destructive/80" : "text-muted-foreground hover:text-destructive/80",
         className
       )}

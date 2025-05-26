@@ -201,10 +201,10 @@ const baseMovies: Movie[] = [
 ];
 
 const OMDB_API_KEY = process.env.OMDB_API_KEY;
-const OMDB_API_URL = `http://www.omdbapi.com/`;
-
 const TMDB_API_KEY = process.env.TMDB_API_KEY;
-const TMDB_API_URL_BASE = `https://api.themoviedb.org/3`;
+const OMDB_API_URL = 'https://www.omdbapi.com/';
+const TMDB_API_URL_BASE = 'https://api.themoviedb.org/3';
+
 
 async function fetchFromOMDB(params: Record<string, string>): Promise<any> {
   if (!OMDB_API_KEY) {
@@ -227,7 +227,7 @@ async function fetchFromOMDB(params: Record<string, string>): Promise<any> {
     // console.log(`OMDB Data received for ${params.t || params.i}:`, data.Title);
     return data;
   } catch (error) {
-    console.error(`Network error fetching from OMDB for params ${JSON.stringify(params)}:`, error);
+    console.error(`Network error fetching from OMDB for params ${JSON.stringify(params)}:`, String(error));
     return null;
   }
 }
@@ -249,7 +249,7 @@ async function fetchTMDBData(endpoint: string, params: Record<string, string> = 
     // console.log(`TMDB Data received for ${endpoint}:`, endpoint.includes('search') ? `${data.results?.length} results` : data.title || data.name);
     return data;
   } catch (error) {
-    console.error(`Network error fetching from TMDB for endpoint ${endpoint} with params ${JSON.stringify(params)}:`, error);
+    console.error(`Network error fetching from TMDB for endpoint ${endpoint} with params ${JSON.stringify(params)}:`, String(error));
     return null;
   }
 }
@@ -297,7 +297,7 @@ function parseYear(yearStr?: string | number): number {
         return (yearStr > 1800 && yearStr < new Date().getFullYear() + 10) ? yearStr : 0;
     }
     // Handles "YYYY-MM-DD" or "YYYY"
-    const match = yearStr.match(/^(\d{4})/);
+    const match = String(yearStr).match(/^(\d{4})/);
     if (match && match[1]) {
         const year = parseInt(match[1], 10);
         return (year > 1800 && year < new Date().getFullYear() + 10) ? year : 0;
@@ -337,7 +337,7 @@ async function transformTMDBMovieToAppMovie(tmdbId: string | number, genresMap: 
     releaseYear: parseYear(movieDetails.release_date),
     rating: parseFloat((movieDetails.vote_average || 0).toFixed(1)), // TMDB rating is 0-10
     durationMinutes: movieDetails.runtime || undefined,
-    director: director || undefined,
+    director: (director && director !== "N/A") ? director : undefined,
     cast: cast.length > 0 ? cast : undefined,
   };
 }
@@ -421,7 +421,7 @@ export const getMovieById = async (id: string): Promise<Movie | undefined> => {
   // Check if ID is purely numeric (potential TMDB ID)
   if (/^\d+$/.test(id) && TMDB_API_KEY) {
     console.log(`[getMovieById] ID ${id} is numeric, attempting TMDB fetch.`);
-    const genresMap = await getTMDBGenresMap();
+    const genresMap = await getTMDBGenresMap(); // Ensure genresMap is available
     const tmdbMovie = await transformTMDBMovieToAppMovie(id, genresMap);
     if (tmdbMovie) {
       console.log(`[getMovieById] Found movie in TMDB: ${tmdbMovie.title}`);
@@ -470,7 +470,7 @@ export const searchMovies = async (query: string): Promise<Movie[]> => {
         // These fields will be populated by getMovieById if the detail page is visited
         durationMinutes: undefined, 
         director: undefined,
-        cast: undefined,
+        cast: undefined, 
         imdbID: undefined, 
       };
     }).filter((movie: Movie) => movie.title !== "N/A" && movie.releaseYear !== 0); // Filter out results with no title or year
@@ -488,6 +488,7 @@ export const getMoviesByGenre = async (genre: string): Promise<Movie[]> => {
   const lowerGenre = genre.toLowerCase();
   console.log(`[getMoviesByGenre] Requested genre: ${genre}`);
 
+  // Filter baseMovies first, then enrich only those.
   const moviesInGenre = baseMovies.filter(movie => {
     const currentMovieGenre = (movie.genre || '').toLowerCase();
     return currentMovieGenre === lowerGenre ||
@@ -495,9 +496,7 @@ export const getMoviesByGenre = async (genre: string): Promise<Movie[]> => {
   });
   
   if (moviesInGenre.length === 0) {
-    console.log(`[getMoviesByGenre] No movies found in baseMovies for genre: ${genre}. Consider TMDB genre search if needed.`);
-    // Potentially, you could add a TMDB search by genre here if baseMovies yield no results.
-    // For now, it only searches baseMovies for genre pages.
+    console.log(`[getMoviesByGenre] No movies found in baseMovies for genre: ${genre}.`);
     return [];
   }
 
@@ -508,7 +507,6 @@ export const getMoviesByGenre = async (genre: string): Promise<Movie[]> => {
 
 export const getGenres = async (): Promise<string[]> => {
   await simulateDelay();
-  // For site navigation, using TMDB genres is more comprehensive
   if (TMDB_API_KEY) {
     const genresMap = await getTMDBGenresMap();
     const genreNames = Object.values(genresMap);
@@ -517,12 +515,11 @@ export const getGenres = async (): Promise<string[]> => {
       return genreNames.sort();
     }
   }
-  // Fallback to genres from baseMovies if TMDB fails or key not present
-  console.log("[getGenres] Falling back to genres from baseMovies.");
-  const allMovies = await getMovies(); // Uses enriched movies to get the most accurate genre list
+  console.log("[getGenres] Falling back to genres from baseMovies (TMDB API key missing or fetch failed).");
+  const allMovies = await getMovies();
   const genres = new Set<string>();
   allMovies.forEach(movie => {
-    if (movie.genre) {
+    if (movie.genre && typeof movie.genre === 'string') {
       movie.genre.split(',').forEach(g => {
         const trimmedGenre = g.trim();
         if (trimmedGenre) genres.add(trimmedGenre);
@@ -531,3 +528,5 @@ export const getGenres = async (): Promise<string[]> => {
   });
   return Array.from(genres).filter(g => g).sort();
 };
+
+
