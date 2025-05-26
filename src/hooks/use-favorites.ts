@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
@@ -38,10 +39,12 @@ export function useFavorites() {
     if (!isMounted) return;
     setFavorites((prevFavorites) => {
       if (!prevFavorites.includes(movieId)) {
-        toast({
-          title: "Added to Favorites",
-          description: `${movieTitle || 'Movie'} has been added to your favorites.`,
-        });
+        setTimeout(() => {
+          toast({
+            title: "Added to Favorites",
+            description: `${movieTitle || 'Movie'} has been added to your favorites.`,
+          });
+        }, 0);
         return [...prevFavorites, movieId];
       }
       return prevFavorites;
@@ -52,11 +55,13 @@ export function useFavorites() {
     if (!isMounted) return;
     setFavorites((prevFavorites) => {
       if (prevFavorites.includes(movieId)) {
-        toast({
-          title: "Removed from Favorites",
-          description: `${movieTitle || 'Movie'} has been removed from your favorites.`,
-          variant: "destructive",
-        });
+        setTimeout(() => {
+          toast({
+            title: "Removed from Favorites",
+            description: `${movieTitle || 'Movie'} has been removed from your favorites.`,
+            variant: "destructive",
+          });
+        }, 0);
         return prevFavorites.filter((id) => id !== movieId);
       }
       return prevFavorites;
