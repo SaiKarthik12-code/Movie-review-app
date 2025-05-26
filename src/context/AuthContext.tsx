@@ -9,6 +9,7 @@ import {
   signOut, 
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword,
+  sendPasswordResetEmail as firebaseSendPasswordResetEmail, // Renamed to avoid conflict
   type AuthError
 } from 'firebase/auth';
 import { useToast } from "@/hooks/use-toast";
@@ -20,6 +21,7 @@ interface AuthContextType {
   loginWithEmail: (email: string, pass: string) => Promise<FirebaseUser | null>;
   logoutUser: () => Promise<void>;
   signUpWithEmail: (email: string, pass: string) => Promise<FirebaseUser | null>;
+  sendPasswordResetEmail: (email: string) => Promise<boolean>; // Changed return type
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -44,7 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const userCredential = await signInWithEmailAndPassword(auth, email, pass);
       setUser(userCredential.user);
       toast({ title: "Logged In", description: "Successfully logged in!" });
-      router.push('/'); // Redirect to home after login
+      router.push('/'); 
       return userCredential.user;
     } catch (error) {
       const authError = error as AuthError;
@@ -62,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
       setUser(userCredential.user);
       toast({ title: "Signed Up", description: "Successfully signed up and logged in!" });
-      router.push('/'); // Redirect to home after signup
+      router.push('/'); 
       return userCredential.user;
     } catch (error) {
       const authError = error as AuthError;
@@ -80,7 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await signOut(auth);
       setUser(null);
       toast({ title: "Logged Out", description: "Successfully logged out." });
-      router.push('/login'); // Redirect to login after logout
+      router.push('/login'); 
     } catch (error) {
       const authError = error as AuthError;
       console.error("Logout error:", authError);
@@ -90,8 +92,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const sendPasswordResetEmail = async (email: string): Promise<boolean> => {
+    setLoading(true);
+    try {
+      await firebaseSendPasswordResetEmail(auth, email);
+      toast({ 
+        title: "Password Reset Email Sent", 
+        description: "If an account exists for this email, a reset link has been sent. Please check your inbox (and spam folder)." 
+      });
+      return true;
+    } catch (error) {
+      const authError = error as AuthError;
+      console.error("Password reset error:", authError);
+      // Avoid telling user if email doesn't exist for security reasons
+      if (authError.code === 'auth/user-not-found') {
+         toast({ 
+          title: "Password Reset Email Sent", 
+          description: "If an account exists for this email, a reset link has been sent. Please check your inbox (and spam folder)." 
+         });
+      } else {
+        toast({ variant: "destructive", title: "Password Reset Failed", description: authError.message || "Could not send reset email." });
+      }
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
   return (
-    <AuthContext.Provider value={{ user, loading, loginWithEmail, logoutUser, signUpWithEmail }}>
+    <AuthContext.Provider value={{ user, loading, loginWithEmail, logoutUser, signUpWithEmail, sendPasswordResetEmail }}>
       {children}
     </AuthContext.Provider>
   );
