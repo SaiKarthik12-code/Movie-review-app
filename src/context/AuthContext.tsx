@@ -9,7 +9,8 @@ import {
   signOut, 
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword,
-  sendPasswordResetEmail as firebaseSendPasswordResetEmail, // Renamed to avoid conflict
+  sendPasswordResetEmail as firebaseSendPasswordResetEmail,
+  sendEmailVerification, // Import sendEmailVerification
   type AuthError
 } from 'firebase/auth';
 import { useToast } from "@/hooks/use-toast";
@@ -21,7 +22,7 @@ interface AuthContextType {
   loginWithEmail: (email: string, pass: string) => Promise<FirebaseUser | null>;
   logoutUser: () => Promise<void>;
   signUpWithEmail: (email: string, pass: string) => Promise<FirebaseUser | null>;
-  sendPasswordResetEmail: (email: string) => Promise<boolean>; // Changed return type
+  sendPasswordResetEmail: (email: string) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -33,17 +34,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setLoading(false);
-    });
-    return () => unsubscribe();
+    // Ensure auth is available before setting up listener
+    if (auth && Object.keys(auth).length > 0) {
+      const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+        if (currentUser) {
+          // Optionally reload user to get latest emailVerified status
+          // currentUser.reload().then(() => setUser(currentUser)).catch(console.error);
+           setUser(currentUser);
+        } else {
+           setUser(null);
+        }
+        setLoading(false);
+      });
+      return () => unsubscribe();
+    } else {
+      // Handle case where auth might not be initialized (e.g., Firebase config error)
+      console.warn("AuthContext: Firebase Auth not available for onAuthStateChanged listener.");
+      setLoading(false); // Stop loading, but user will be null
+    }
   }, []);
 
   const loginWithEmail = async (email: string, pass: string): Promise<FirebaseUser | null> => {
+    if (!auth || Object.keys(auth).length === 0) {
+      toast({ variant: "destructive", title: "Login Failed", description: "Authentication service is not available." });
+      return null;
+    }
     setLoading(true);
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, pass);
+      await userCredential.user.reload(); // Get the latest user data, including emailVerified
+
+      if (!userCredential.user.emailVerified) {
+        await sendEmailVerification(userCredential.user);
+        toast({
+          title: "Email Not Verified",
+          description: `Your email (${userCredential.user.email}) is not verified. A new verification link has been sent. Please check your inbox (and spam folder) and click the link to verify before logging in.`,
+          duration: 9000, // Longer duration for this important message
+        });
+        await signOut(auth); // Sign out the user
+        // setUser(null); // onAuthStateChanged will handle this
+        return null; // Indicate login failure
+      }
+
       setUser(userCredential.user);
       toast({ title: "Logged In", description: "Successfully logged in!" });
       router.push('/'); 
@@ -59,13 +91,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
   
   const signUpWithEmail = async (email: string, pass: string): Promise<FirebaseUser | null> => {
+     if (!auth || Object.keys(auth).length === 0) {
+      toast({ variant: "destructive", title: "Signup Failed", description: "Authentication service is not available." });
+      return null;
+    }
     setLoading(true);
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-      setUser(userCredential.user);
-      toast({ title: "Signed Up", description: "Successfully signed up and logged in!" });
-      router.push('/'); 
-      return userCredential.user;
+      await sendEmailVerification(userCredential.user);
+      toast({
+        title: "Signup Successful!",
+        description: `A verification email has been sent to ${userCredential.user.email}. Please check your inbox (and spam folder) to verify your account before logging in.`,
+        duration: 9000, // Longer duration
+      });
+      await signOut(auth); // Sign out user, they need to verify first
+      // setUser(null); // onAuthStateChanged will handle this
+      router.push('/login'); // Redirect to login page after signup instructions
+      return userCredential.user; // Return user for potential immediate use, though they are signed out
     } catch (error) {
       const authError = error as AuthError;
       console.error("Signup error:", authError);
@@ -77,10 +119,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logoutUser = async () => {
+    if (!auth || Object.keys(auth).length === 0) {
+      toast({ variant: "destructive", title: "Logout Failed", description: "Authentication service is not available." });
+      return;
+    }
     setLoading(true);
     try {
       await signOut(auth);
-      setUser(null);
+      // setUser(null); // onAuthStateChanged will handle this
       toast({ title: "Logged Out", description: "Successfully logged out." });
       router.push('/login'); 
     } catch (error) {
@@ -93,6 +139,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const sendPasswordResetEmail = async (email: string): Promise<boolean> => {
+    if (!auth || Object.keys(auth).length === 0) {
+      toast({ variant: "destructive", title: "Password Reset Failed", description: "Authentication service is not available." });
+      return false;
+    }
     setLoading(true);
     try {
       await firebaseSendPasswordResetEmail(auth, email);
@@ -104,7 +154,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       const authError = error as AuthError;
       console.error("Password reset error:", authError);
-      // Avoid telling user if email doesn't exist for security reasons
       if (authError.code === 'auth/user-not-found') {
          toast({ 
           title: "Password Reset Email Sent", 
