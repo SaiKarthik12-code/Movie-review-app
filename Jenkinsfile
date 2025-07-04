@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         // Set NodeJS home using the name configured in Global Tool Configuration
-        NODEJS_HOME = "${tool 'NodeJS 20'}"
+        NODEJS_HOME = "${tool 'NodeJS 24.3.0'}"
         PATH = "${NODEJS_HOME}/bin:${env.PATH}"
         APP_DIR = "/home/ubuntu/Movie-review-app" // Your application directory on EC2
         EC2_IP = "13.201.132.117" // Your EC2 public IP
