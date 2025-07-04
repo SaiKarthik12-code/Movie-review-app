@@ -6,7 +6,7 @@ pipeline {
         NODEJS_HOME = "${tool 'NodeJS 24.3.0'}"
         PATH = "${NODEJS_HOME}/bin:${env.PATH}"
         APP_DIR = "/home/ubuntu/Movie-review-app" // Your application directory on EC2
-        EC2_IP = "13.201.132.117" // Your EC2 public IP
+        EC2_IP = "13.127.102.201" // Your EC2 public IP
         EC2_USER = "ubuntu"
         SSH_CREDENTIAL_ID = "ec2-deploy-key" // ID of the SSH credential you created in Jenkins
     }
