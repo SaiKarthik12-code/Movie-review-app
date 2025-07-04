@@ -7,7 +7,8 @@ module.exports = {
     {
       name: 'MovieVerse-Frontend',
       script: 'npm',
-      args: 'start', // Runs `next start`
+      args: 'start', 
+      cwd: './', 
       env_production: {
         NODE_ENV: 'production',
         PORT: 3000,
