@@ -56,6 +56,7 @@ pipeline {
                     ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_IP} "cd ${APP_DIR} && \
                     npm install --production && \
                     pm2 start ecosystem.config.js && \
+                    pm2 restart ecosystem.config.js &&
                     pm2 save"
                     """
                 }
