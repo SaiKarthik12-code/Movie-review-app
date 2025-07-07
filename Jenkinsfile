@@ -8,7 +8,7 @@ pipeline {
 
         // !! IMPORTANT: Replace these placeholders with your actual values !!
         APP_DIR = "/home/ubuntu/Movie-review-app" // The absolute path to your app's root on the EC2 instance
-        EC2_IP = "13.127.102.201" // Your EC2 Public IP address
+        EC2_IP = "3.110.51.44" // Your EC2 Public IP address
         EC2_USER = "ubuntu" // The SSH username for your EC2 instance (usually 'ubuntu' for Ubuntu AMIs)
         SSH_CREDENTIAL_ID = "my-key-pair.pem" // The ID of the SSH credential you created in Jenkins
 
