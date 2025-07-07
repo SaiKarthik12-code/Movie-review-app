@@ -60,7 +60,7 @@ export default function LoginPage() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold text-primary">Welcome Back!</CardTitle>
+          <CardTitle className="text-3xl font-bold text-primary">Welcome!</CardTitle>
           <CardDescription>Log in to continue to MovieVerse.</CardDescription>
         </CardHeader>
         <CardContent>
