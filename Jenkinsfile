@@ -8,7 +8,7 @@ pipeline {
 
         // !! IMPORTANT: Replace these placeholders with your actual values !!
         APP_DIR = "/home/ubuntu/Movie-review-app" // The absolute path to your app's root on the EC2 instance
-        EC2_IP = "3.110.51.44" // Your EC2 Public IP address
+        EC2_IP = "13.203.156.178" // Your EC2 Public IP address
         EC2_USER = "ubuntu" // The SSH username for your EC2 instance (usually 'ubuntu' for Ubuntu AMIs)
         SSH_CREDENTIAL_ID = "my-key-pair.pem" // The ID of the SSH credential you created in Jenkins
 
@@ -35,33 +35,29 @@ pipeline {
         }
 
         stage('Deploy to EC2') {
-            steps {
-                echo 'Deploying built application to EC2...'
-                sshagent(credentials: [SSH_CREDENTIAL_ID]) {
-                    // Stop PM2 processes and clear the existing application directory on EC2
-                    sh "ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_IP} 'pm2 stop all; rm -rf ${APP_DIR}/*; mkdir -p ${APP_DIR}'"
+    steps {
+        echo 'Deploying built application to EC2...'
+        sshagent(credentials: [SSH_CREDENTIAL_ID]) {
+            // Stop PM2 processes and clear the existing application directory on EC2
+            // Use sudo to ensure permissions to remove the .next directory and its contents
+            sh "ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_IP} \'pm2 stop all; **sudo rm -rf ${APP_DIR}/.next;** rm -rf ${APP_DIR}/*; mkdir -p ${APP_DIR}\'\"\n
 
-                    // Use rsync to efficiently copy the built application from Jenkins workspace to EC2
-                    // -a: archive mode (preserves permissions, ownership, etc.)
-                    // -v: verbose output
-                    // -z: compress file data during transfer
-                    // --delete: delete extraneous files from dest dir (ensures old files are removed)
-                    // --exclude=node_modules: exclude node_modules from transfer (we'll install prod only on EC2)
-                    // --exclude=.git: exclude .git directory
-                    sh "rsync -avz --delete --exclude=node_modules --exclude=.git ${JENKINS_WORKSPACE_APP}/ ${EC2_USER}@${EC2_IP}:${APP_DIR}/"
+            // Use rsync to efficiently copy the built application from Jenkins workspace to EC2
+            sh "rsync -avz --delete --exclude=node_modules --exclude=.git ${JENKINS_WORKSPACE_APP}/ ${EC2_USER}@${EC2_IP}:${APP_DIR}/"\n
 
-                    // After copying, install only production dependencies on EC2
-                    // Then restart PM2 processes and save state
-                    sh """
-                    ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_IP} "cd ${APP_DIR} && \
-                    npm install --production && \
-                    pm2 start ecosystem.config.js && \
-                    pm2 restart ecosystem.config.js &&
-                    pm2 save"
-                    """
-                }
-            }
+            // After copying, install only production dependencies on EC2
+            // Then restart PM2 processes and save state
+            sh """
+            ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_IP} "cd ${APP_DIR} && \\
+            npm install --production && \\
+            pm2 start ecosystem.config.js && \\
+            pm2 restart ecosystem.config.js && \\
+            pm2 save"
+            """
         }
+    }
+}
+
 
         stage('Clean Workspace') {
             steps {
