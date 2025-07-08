@@ -34,16 +34,15 @@ pipeline {
             }
         }
 
-        stage('Deploy to EC2') {
+stage('Deploy to EC2') {
     steps {
         echo 'Deploying built application to EC2...'
         sshagent(credentials: [SSH_CREDENTIAL_ID]) {
-            // Stop PM2 processes and clear the existing application directory on EC2
-            // Use sudo to ensure permissions to remove the .next directory and its contents
-            sh "ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_IP} \'pm2 stop all; **sudo rm -rf ${APP_DIR}/.next;** rm -rf ${APP_DIR}/*; mkdir -p ${APP_DIR}\'\"\n
+            // Stop PM2 processes, remove the .next directory with sudo, clear the rest of the directory, and recreate it
+            sh "ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_IP} \'pm2 stop all; sudo rm -rf ${APP_DIR}/.next; rm -rf ${APP_DIR}/*; mkdir -p ${APP_DIR}\'" // Corrected line - removed the extra \n and split the command logically
 
             // Use rsync to efficiently copy the built application from Jenkins workspace to EC2
-            sh "rsync -avz --delete --exclude=node_modules --exclude=.git ${JENKINS_WORKSPACE_APP}/ ${EC2_USER}@${EC2_IP}:${APP_DIR}/"\n
+            sh "rsync -avz --delete --exclude=node_modules --exclude=.git ${JENKINS_WORKSPACE_APP}/ ${EC2_USER}@${EC2_IP}:${APP_DIR}/"
 
             // After copying, install only production dependencies on EC2
             // Then restart PM2 processes and save state
