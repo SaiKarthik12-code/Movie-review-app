@@ -21,7 +21,7 @@ module.exports = {
         NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: 'your-sender-id',
         NEXT_PUBLIC_FIREBASE_APP_ID: '1:your-app-id:web:your-web-id',
         // !! IMPORTANT: Update this to your EC2 public IP or domain name !!
-        NEXT_PUBLIC_SITE_URL: 'http://13.201.132.117:3000',
+        NEXT_PUBLIC_SITE_URL: 'http://13.127.217.202:3000',
       },
     },
     {
